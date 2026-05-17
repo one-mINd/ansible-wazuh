@@ -1,0 +1,101 @@
+---
+- name: Ensure Wazuh host config directory
+  ansible.builtin.file:
+    dest: "{{ wazuh_docker_dir }}"
+    state: directory
+    mode: "0775"
+  tags:
+    - install
+
+- name: Ensure Wazuh manager bind directories
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    mode: "0775"
+  loop:
+    - "{{ wazuh_docker_dir }}/manager/ossec/api/configuration"
+    - "{{ wazuh_docker_dir }}/manager/ossec/etc"
+    - "{{ wazuh_docker_dir }}/manager/ossec/logs"
+    - "{{ wazuh_docker_dir }}/manager/ossec/queue"
+    - "{{ wazuh_docker_dir }}/manager/ossec/var/multigroups"
+    - "{{ wazuh_docker_dir }}/manager/ossec/integrations"
+    - "{{ wazuh_docker_dir }}/manager/ossec/active-response/bin"
+    - "{{ wazuh_docker_dir }}/manager/ossec/agentless"
+    - "{{ wazuh_docker_dir }}/manager/ossec/wodles"
+    - "{{ wazuh_docker_dir }}/manager/filebeat"
+    - "{{ wazuh_docker_dir }}/manager/lib/filebeat"
+  when: wazuh_docker_bind_volumes_on_host
+  tags:
+    - install
+
+- name: Ensure Wazuh indexer and dashboard directories
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    mode: "0775"
+    owner: 1000
+    group: 1000
+  loop:
+      - "{{ wazuh_docker_dir }}/indexer"
+      - "{{ wazuh_docker_dir }}/dashboard/config"
+      - "{{ wazuh_docker_dir }}/dashboard/custom"
+  when: wazuh_docker_bind_volumes_on_host
+  tags:
+    - install
+
+- name: Clone Wazuh Docker repository
+  ansible.builtin.git:
+    repo: "https://github.com/wazuh/wazuh-docker.git"
+    dest: "{{ wazuh_docker_dir }}/wazuh-docker"
+    version: "{{ wazuh_docker_version }}"
+    clone: true
+    update: true
+  tags:
+    - install
+
+- name: Copy wazuh single-node directory to host config directory
+  ansible.builtin.copy:
+    src: "{{ wazuh_docker_dir }}/wazuh-docker/single-node/"
+    dest: "{{ wazuh_docker_dir }}"
+    remote_src: true
+  tags:
+    - install
+
+- name: Remove git repo wazuh directory
+  ansible.builtin.file:
+    path: "{{ wazuh_docker_dir }}/wazuh-docker"
+    state: absent
+  tags:
+    - install
+
+- name: Ensure compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /etc/wazuh/docker-compose.yml
+  tags:
+    - install
+
+- name: Check certs already exists
+  ansible.builtin.stat:
+    path: /etc/wazuh/config/wazuh_indexer_ssl_certs
+  register: wazuh_indexer_ssl_certs_dir_status
+  tags:
+    - install
+
+- name: Run Wazuh indexer cert generator
+  become: true
+  ansible.builtin.command:
+    cmd: >
+      docker compose
+      -f {{ wazuh_docker_dir }}/generate-indexer-certs.yml
+      run --rm generator
+  when: not wazuh_indexer_ssl_certs_dir_status.stat.exists
+  tags:
+    - install
+
+- name: Start Wazuh
+  community.docker.docker_compose_v2:
+    project_src: "{{ wazuh_docker_dir }}"
+    state: present
+  tags:
+    - install

@@ -1,56 +1,9 @@
 ---
-- name: Ensure Wazuh host config directory
-  ansible.builtin.file:
-    dest: "{{ wazuh_docker_dir }}"
-    state: directory
-    mode: "0775"
-  register: wazuh_hostconfigdir_status
+- name: Install Wazuh
+  ansible.builtin.include_tasks: "install.yml"
 
-- name: Clone Wazuh Docker repository
-  ansible.builtin.git:
-    repo: "https://github.com/wazuh/wazuh-docker.git"
-    dest: "{{ wazuh_docker_dir }}/wazuh-docker"
-    version: "{{ wazuh_docker_version }}"
-    clone: true
-    update: true
+- name: Set admin password
+  ansible.builtin.include_tasks: "admin-password.yml"
 
-- name: Copy wazuh single-node directory to host config directory
-  ansible.builtin.copy:
-    src: "{{ wazuh_docker_dir }}/wazuh-docker/single-node/"
-    dest: "{{ wazuh_docker_dir }}"
-    remote_src: true
-
-- name: Remove git repo wazuh directory
-  ansible.builtin.file:
-    path: "{{ wazuh_docker_dir }}/wazuh-docker"
-    state: absent
-
-- name: Remove ports section from wazuh.dashboard service
-  ansible.builtin.lineinfile:
-    path: "{{ wazuh_docker_dir }}/docker-compose.yml"
-    regexp: '^(\s*){{ item }}\s*$'
-    line: ''
-    state: present
-  loop:
-    - "ports:"
-    - "- 443:5601"
-  when: wazuh_docker_disable_https_port
-
-- name: Check certs already exists
-  ansible.builtin.stat:
-    path: /etc/wazuh/config/wazuh_indexer_ssl_certs
-  register: wazuh_indexer_ssl_certs_dir_status
-
-- name: Run Wazuh indexer cert generator
-  become: true
-  ansible.builtin.command:
-    cmd: >
-      docker compose
-      -f {{ wazuh_docker_dir }}/generate-indexer-certs.yml
-      run --rm generator
-  when: not wazuh_indexer_ssl_certs_dir_status.stat.exists
-
-- name: Start Wazuh
-  community.docker.docker_compose_v2:
-    project_src: "{{ wazuh_docker_dir }}"
-    state: present
+- name: Set ossec conf file
+  ansible.builtin.include_tasks: "configuration.yml"
