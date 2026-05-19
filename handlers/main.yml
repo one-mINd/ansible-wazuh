@@ -1,0 +1,10 @@
+---
+- name: Restart Wazuh | down
+  community.docker.docker_compose_v2:
+    project_src: "{{ wazuh_docker_dir }}"
+    state: absent
+
+- name: Restart Wazuh | up
+  community.docker.docker_compose_v2:
+    project_src: "{{ wazuh_docker_dir }}"
+    state: present

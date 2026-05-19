@@ -1,0 +1,37 @@
+---
+- name: Find existing Wazuh rule files
+  ansible.builtin.find:
+    paths: "{{ wazuh_docker_dir }}/manager/ossec/etc/rules"
+    file_type: file
+    patterns: "*.xml"
+  register: wazuh_existing_rule_files
+  tags:
+    - rules
+
+- name: Remove unmanaged Wazuh rule files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ wazuh_existing_rule_files.files }}"
+  when: >
+    (item.path | basename) not in
+    (wazuh_rules | map(attribute='filename') | list)
+  notify:
+    - Restart Wazuh | down
+    - Restart Wazuh | up
+  tags:
+    - rules
+
+- name: Deploy custom Wazuh rules
+  ansible.builtin.copy:
+    content: "{{ item.data }}"
+    dest: "{{ wazuh_docker_dir }}/manager/ossec/etc/rules/{{ item.filename }}"
+    mode: '0640'
+    owner: 999
+    group: 999
+  loop: "{{ wazuh_rules }}"
+  notify:
+    - Restart Wazuh | down
+    - Restart Wazuh | up
+  tags:
+    - rules

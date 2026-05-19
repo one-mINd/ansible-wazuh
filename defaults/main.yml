@@ -15,3 +15,17 @@ wazih_ossec_extra_configs: ""
 #     <location>some-log.log</location>
 #     <log_format>json</log_format>
 #   </localfile>
+
+wazuh_rules: []
+# Example
+# wazuh_local_rules:
+#   filename: 10_example.xml
+#   data: |
+#     <!-- Local rules -->
+#     <group name="local,syslog,sshd,">
+#       <rule id="100001" level="5">
+#         <some_conf>conf</some_conf>
+#       </rule>
+#
+# wazuh_rules:
+# - "{{ wazuh_local_rules }}"

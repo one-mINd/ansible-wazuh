@@ -3,6 +3,9 @@
   ansible.builtin.template:
     src: ossec.conf.j2
     dest: "{{ wazuh_docker_dir }}/config/wazuh_cluster/wazuh_manager.conf"
+  notify:
+    - Restart Wazuh | down
+    - Restart Wazuh | up
   tags:
     - configuration
 
@@ -25,19 +28,8 @@
       attributes: +i
 
   when: wazuh_docker_bind_volumes_on_host
-  tags:
-    - configuration
-
-- name: Restart Wazuh | down
-  community.docker.docker_compose_v2:
-    project_src: "{{ wazuh_docker_dir }}"
-    state: absent
-  tags:
-    - configuration
-
-- name: Restart Wazuh | up
-  community.docker.docker_compose_v2:
-    project_src: "{{ wazuh_docker_dir }}"
-    state: present
+  notify:
+    - Restart Wazuh | down
+    - Restart Wazuh | up
   tags:
     - configuration

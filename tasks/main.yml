@@ -1,9 +1,20 @@
 ---
 - name: Install Wazuh
   ansible.builtin.include_tasks: "install.yml"
+  tags:
+    - install
 
 - name: Set admin password
   ansible.builtin.include_tasks: "admin-password.yml"
+  tags:
+    - admin-password
 
-- name: Set ossec conf file
+- name: Set configuration files
   ansible.builtin.include_tasks: "configuration.yml"
+  tags:
+    - configuration
+
+- name: Set rules
+  ansible.builtin.include_tasks: "rules.yml"
+  tags:
+    - rules
