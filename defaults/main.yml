@@ -29,3 +29,10 @@ wazuh_rules: []
 #
 # wazuh_rules:
 # - "{{ wazuh_local_rules }}"
+
+# Uncomment this block for configure sending alerts to Telegram
+# wazuh_telegram_integration:
+#   chat_id: none
+#   bot_token: none
+#   alerts_level: 5
+#   # proxy_url: http:127.0.0.1:123

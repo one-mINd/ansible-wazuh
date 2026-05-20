@@ -14,6 +14,7 @@ This role installs a dockerized single-node Wazuh stack based on the official Wa
 * Allows extending and modifying `ossec.conf`
 * Mounts all persistent Wazuh volumes to the host filesystem
 * Supports mounting additional custom volumes into Wazuh containers
+* Sending alerts to Telegram
 
 ## Example Playbook
 

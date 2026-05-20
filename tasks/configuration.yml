@@ -33,3 +33,21 @@
     - Restart Wazuh | up
   tags:
     - configuration
+
+- name: Ensure custom-telegram integration file
+  ansible.builtin.template:
+    src: custom-telegram.j2
+    dest: "{{ wazuh_docker_dir }}/manager/ossec/integrations/custom-telegram"
+    owner: root
+    group: 999
+    mode: '0750'
+  when: 
+    - wazuh_docker_bind_volumes_on_host
+    - wazuh_telegram_integration is defined
+  notify:
+    - Restart Wazuh | down
+    - Restart Wazuh | up
+    - Install python3-pip inside wazuh manager container
+    - Install requests library inside wazuh manager container
+  tags:
+    - configuration
