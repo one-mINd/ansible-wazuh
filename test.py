@@ -13,7 +13,7 @@ except Exception:
     sys.exit(1)
 
 # Chat ID
-CHAT_ID = "{{ wazuh_telegram_integration.chat_id }}"
+CHAT_ID = "-5113611513"
 
 # Function for creating a message based on an alert
 def create_message(alert_json):
@@ -40,8 +40,8 @@ def create_message(alert_json):
     msg_data['parse_mode'] = 'Markdown'
 
     # Debugging information
-    with open('/var/ossec/logs/integrations.log', 'a') as f:
-        f.write(f'MSG: {msg_data}\n')
+    # with open('/var/ossec/logs/integrations.log', 'a') as f:
+    #     f.write(f'MSG: {msg_data}\n')
 
     return json.dumps(msg_data)
 
@@ -57,27 +57,15 @@ alert_file.close()
 msg_data = create_message(alert_json)
 headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8'}
 
-{% if wazuh_telegram_integration.proxy_url is defined %}
-response = requests.post(
-    hook_url,
-    headers=headers,
-    data=msg_data,
-    proxies = {
-        "http": "{{ wazuh_telegram_integration.proxy_url }}",
-        "https": "{{ wazuh_telegram_integration.proxy_url }}"
-    }
-)
-{% else %}
 response = requests.post(
     hook_url,
     headers=headers,
     data=msg_data
 )
-{% endif %}
 
 # Debugging information
-with open('/var/ossec/logs/integrations.log', 'a') as f:
-    f.write(f'ANSWER STATUS: {response.status_code}\n')
-    f.write(f'ANSWER TEXT: {response.text}\n')
+# with open('/var/ossec/logs/integrations.log', 'a') as f:
+#     f.write(f'ANSWER STATUS: {response.status_code}\n')
+#     f.write(f'ANSWER TEXT: {response.text}\n')
 
 sys.exit(0)

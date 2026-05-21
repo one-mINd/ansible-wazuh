@@ -1,0 +1,13 @@
+{
+  "rule": {
+    "description": "Test alert from Wazuh",
+    "level": "5",
+    "groups": ["test", "integration"],
+    "id": "100001"
+  },
+  "full_log": "This is a test alert log\nSecond line",
+  "agent": {
+    "name": "test-agent",
+    "id": "001"
+  }
+}
