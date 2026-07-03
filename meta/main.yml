@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: Dmitry Razin
+  description: Role for Wazuh install
+  company: Personal project
+  role_name: ansible-wazuh
+  namespace: one_mind
+
+  license: Apache
+
+  min_ansible_version: 4
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+
+  galaxy_tags: [wazuh]
+
+dependencies: []
