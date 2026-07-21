@@ -8,6 +8,9 @@ wazuh_enable_archives: True
 wazuh_docker_disable_https_port: True
 wazuh_docker_extra_volumes: []
 
+wazuh_agent_password_use: False
+wazuh_agent_password: "testpass"
+
 wazuh_ossec_global_configs: |
   <global>
       <jsonout_output>yes</jsonout_output>

@@ -51,3 +51,12 @@
     - Install requests library inside wazuh manager container
   tags:
     - configuration
+
+- name: Create agent pass file
+  ansible.builtin.shell: |
+    docker exec wazuh-wazuh.manager-1 bash -c '
+      echo "{{ wazuh_agent_password }}" > /var/ossec/etc/authd.pass
+      chmod 640 /var/ossec/etc/authd.pass
+      chown root:wazuh /var/ossec/etc/authd.pass
+    '
+  when: wazuh_agent_password_use
