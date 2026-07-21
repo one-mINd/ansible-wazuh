@@ -19,6 +19,8 @@
   notify:
     - Restart Wazuh | down
     - Restart Wazuh | up
+    - Install python3-pip inside wazuh manager container
+    - Install requests library inside wazuh manager container
   tags:
     - rules
 
@@ -33,5 +35,7 @@
   notify:
     - Restart Wazuh | down
     - Restart Wazuh | up
+    - Install python3-pip inside wazuh manager container
+    - Install requests library inside wazuh manager container
   tags:
     - rules

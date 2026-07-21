@@ -4,17 +4,18 @@ wazuh_docker_version: v4.14.5
 wazuh_admin_password: SecretPassword 
 wazuh_docker_bind_volumes_on_host: True
 # wazuh_docker_bind_volumes_on_host must be "true" for enable archives
-wazuh_enable_archives: True
 wazuh_docker_disable_https_port: True
 wazuh_docker_extra_volumes: []
 
-wazih_ossec_extra_configs: ""
+# Specific ossec confs that will be merged with the default ones
+# For examples check the default confs in vars->main.yml
+wazuh_ossec_conf: {}
 # Example
-# wazih_ossec_extra_configs: |
-#   <localfile>
-#     <location>some-log.log</location>
-#     <log_format>json</log_format>
-#   </localfile>
+# wazuh_ossec_conf:
+#   ossec_config:
+#     global:
+#     - logall: 'yes'
+#       logall_json: 'yes'
 
 wazuh_rules: []
 # Example

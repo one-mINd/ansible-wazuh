@@ -1,4 +1,8 @@
 ---
+- name: Deep merge ossec conf with defaults
+  set_fact:
+    wazuh_ossec_conf_merged: "{{ wazuh_ossec_conf_default | ansible.builtin.combine(wazuh_ossec_conf, list_merge='append', recursive=true) }}"
+
 - name: Ensure ossec.conf file
   ansible.builtin.template:
     src: ossec.conf.j2
@@ -6,6 +10,8 @@
   notify:
     - Restart Wazuh | down
     - Restart Wazuh | up
+    - Install python3-pip inside wazuh manager container
+    - Install requests library inside wazuh manager container
   tags:
     - configuration
 
@@ -31,6 +37,8 @@
   notify:
     - Restart Wazuh | down
     - Restart Wazuh | up
+    - Install python3-pip inside wazuh manager container
+    - Install requests library inside wazuh manager container
   tags:
     - configuration
 

@@ -1,0 +1,191 @@
+wazuh_ossec_conf_default:
+  ossec_config:
+    alerts:
+      email_alert_level: '12'
+      log_alert_level: '3'
+    cluster:
+      bind_addr: 0.0.0.0
+      disabled: 'yes'
+      hidden: 'no'
+      key: aa093264ef885029653eea20dfcf51ae
+      name: wazuh
+      node_name: node01
+      node_type: master
+      nodes:
+        node: wazuh.manager
+      port: '1516'
+    command:
+    - executable: disable-account
+      name: disable-account
+      timeout_allowed: 'yes'
+    - executable: restart-wazuh
+      name: restart-wazuh
+    - executable: firewall-drop
+      name: firewall-drop
+      timeout_allowed: 'yes'
+    - executable: host-deny
+      name: host-deny
+      timeout_allowed: 'yes'
+    - executable: route-null
+      name: route-null
+      timeout_allowed: 'yes'
+    - executable: route-null.exe
+      name: win_route-null
+      timeout_allowed: 'yes'
+    - executable: netsh.exe
+      name: netsh
+      timeout_allowed: 'yes'
+    global:
+    - agents_disconnection_alert_time: '0'
+      agents_disconnection_time: 10m
+      alerts_log: 'yes'
+      email_from: wazuh@example.wazuh.com
+      email_log_source: alerts.log
+      email_maxperhour: '12'
+      email_notification: 'no'
+      email_to: recipient@example.wazuh.com
+      jsonout_output: 'yes'
+      logall: 'no'
+      logall_json: 'no'
+      smtp_server: smtp.example.wazuh.com
+    - white_list:
+      - 127.0.0.1
+      - ^localhost.localdomain$
+    indexer:
+      enabled: 'yes'
+      hosts:
+        host: https://wazuh.indexer:9200
+      ssl:
+        certificate: /etc/ssl/filebeat.pem
+        certificate_authorities:
+          ca: /etc/ssl/root-ca.pem
+        key: /etc/ssl/filebeat.key
+    localfile:
+    - command: df -P
+      frequency: '360'
+      log_format: command
+    - alias: netstat listening ports
+      command: netstat -tulpn | sed 's/\([[:alnum:]]\+\)\ \+[[:digit:]]\+\ \+[[:digit:]]\+\ \+\(.*\):\([[:digit:]]*\)\ \+\([0-9\.\:\*]\+\).\+\ \([[:digit:]]*\/[[:alnum:]\-]*\).*/\1 \2 == \3 == \4 \5/' | sort -k 4 -g | sed 's/ == \(.*\) ==/:\1/' | sed 1,2d
+      frequency: '360'
+      log_format: full_command
+    - command: last -n 20
+      frequency: '360'
+      log_format: full_command
+    - location: /var/ossec/logs/active-responses.log
+      log_format: syslog
+    logging:
+      log_format: plain
+    remote:
+      connection: secure
+      port: '1514'
+      protocol: tcp
+      queue_size: '131072'
+    rootcheck:
+      check_dev: 'yes'
+      check_files: 'yes'
+      check_if: 'yes'
+      check_pids: 'yes'
+      check_ports: 'yes'
+      check_sys: 'yes'
+      check_trojans: 'yes'
+      disabled: 'no'
+      frequency: '43200'
+      rootkit_files: etc/rootcheck/rootkit_files.txt
+      rootkit_trojans: etc/rootcheck/rootkit_trojans.txt
+      skip_nfs: 'yes'
+    rule_test:
+      enabled: 'yes'
+      max_sessions: '64'
+      session_timeout: 15m
+      threads: '1'
+    ruleset:
+      decoder_dir:
+      - ruleset/decoders
+      - etc/decoders
+      list:
+      - etc/lists/audit-keys
+      - etc/lists/amazon/aws-eventnames
+      - etc/lists/security-eventchannel
+      - etc/lists/malicious-ioc/malicious-ip
+      - etc/lists/malicious-ioc/malicious-domains
+      - etc/lists/malicious-ioc/malware-hashes
+      rule_dir:
+      - ruleset/rules
+      - etc/rules
+      rule_exclude: 0215-policy_rules.xml
+    sca:
+      enabled: 'yes'
+      interval: 12h
+      scan_on_start: 'yes'
+      skip_nfs: 'yes'
+    syscheck:
+      alert_new_files: 'yes'
+      auto_ignore:
+        '#text': 'no'
+        '@frequency': '10'
+        '@timeframe': '3600'
+      directories:
+      - /etc,/usr/bin,/usr/sbin
+      - /bin,/sbin,/boot
+      disabled: 'no'
+      frequency: '43200'
+      ignore:
+      - /etc/mtab
+      - /etc/hosts.deny
+      - /etc/mail/statistics
+      - /etc/random-seed
+      - /etc/random.seed
+      - /etc/adjtime
+      - /etc/httpd/logs
+      - /etc/utmpx
+      - /etc/wtmpx
+      - /etc/cups/certs
+      - /etc/dumpdates
+      - /etc/svc/volatile
+      - '#text': .log$|.swp$
+        '@type': sregex
+      max_eps: '100'
+      nodiff: /etc/ssl/private.key
+      process_priority: '10'
+      scan_on_start: 'yes'
+      skip_dev: 'yes'
+      skip_nfs: 'yes'
+      skip_proc: 'yes'
+      skip_sys: 'yes'
+      synchronization:
+        enabled: 'yes'
+        interval: 5m
+        max_eps: '10'
+        max_interval: 1h
+    vulnerability-detection:
+      enabled: 'yes'
+      feed-update-interval: 60m
+      index-status: 'yes'
+    wodle:
+    - '@name': cis-cat
+      ciscat_path: wodles/ciscat
+      disabled: 'yes'
+      interval: 1d
+      java_path: wodles/java
+      scan-on-start: 'yes'
+      timeout: '1800'
+    - '@name': osquery
+      add_labels: 'yes'
+      config_path: /etc/osquery/osquery.conf
+      disabled: 'yes'
+      log_path: /var/log/osquery/osqueryd.results.log
+      run_daemon: 'yes'
+    - '@name': syscollector
+      disabled: 'no'
+      hardware: 'yes'
+      interval: 1h
+      network: 'yes'
+      os: 'yes'
+      packages: 'yes'
+      ports:
+        '#text': 'yes'
+        '@all': 'yes'
+      processes: 'yes'
+      scan_on_start: 'yes'
+      synchronization:
+        max_eps: '10'
