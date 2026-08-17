@@ -6,6 +6,7 @@ wazuh_docker_bind_volumes_on_host: True
 # wazuh_docker_bind_volumes_on_host must be "true" for enable archives
 wazuh_docker_disable_https_port: True
 wazuh_docker_extra_volumes: []
+wazuh_opensearch_java_opts: "-Xms1g -Xmx1g"
 
 # Specific ossec confs that will be merged with the default ones
 # For examples check the default confs in vars->main.yml
